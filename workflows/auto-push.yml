@@ -1,0 +1,59 @@
+name: Auto Push Daily Letter
+
+on:
+  schedule:
+    # Runs at 00:00 and 12:00 UTC every day (12 AM and 12 PM UTC)
+    - cron: '0 0,12 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions or Web Dashboard
+
+jobs:
+  push-letter:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate Random Letter & Append
+        id: letter-gen
+        run: |
+          # Define character pool (A-Z)
+          LETTERS="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+          RANDOM_INDEX=$(( RANDOM % ${#LETTERS} ))
+          CHOSEN_LETTER="${LETTERS:$RANDOM_INDEX:1}"
+          
+          # Current UTC Timestamp
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          
+          echo "Generated letter: $CHOSEN_LETTER at $TIMESTAMP"
+          echo "letter=$CHOSEN_LETTER" >> $GITHUB_OUTPUT
+          echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+
+          # Ensure the file exists and append the new letter entry
+          TARGET_FILE="letters_log.txt"
+          if [ ! -f "$TARGET_FILE" ]; then
+            echo "# Automated Daily Letters Stream" > "$TARGET_FILE"
+            echo "Auto-generated commits twice daily (12:00 AM & 12:00 PM)." >> "$TARGET_FILE"
+            echo "--------------------------------------------------------" >> "$TARGET_FILE"
+          fi
+
+          echo "[$TIMESTAMP] Pushed Letter: $CHOSEN_LETTER" >> "$TARGET_FILE"
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add letters_log.txt
+          
+          # Only commit if there are changes
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Auto push letter '${{ steps.letter-gen.outputs.letter }}' [${{ steps.letter-gen.outputs.timestamp }}]"
+            git push
+          fi

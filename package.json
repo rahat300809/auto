@@ -1,0 +1,14 @@
+{
+  "name": "auto-push-engine",
+  "version": "1.0.0",
+  "description": "Automated 24/7 GitHub Push Web Dashboard & Cron Engine",
+  "main": "serve.js",
+  "scripts": {
+    "start": "node serve.js",
+    "deploy:vercel": "npx vercel --prod",
+    "deploy:firebase": "firebase deploy --only hosting"
+  },
+  "keywords": ["github-actions", "firebase", "vercel", "auto-push", "cron"],
+  "author": "",
+  "license": "MIT"
+}

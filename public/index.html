@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoPush | Automated Daily GitHub Commit Engine</title>
+  <meta name="description" content="Automated 24/7 daily GitHub push engine hosted on Firebase. Automatically pushes a random letter twice daily at 12:00 AM and 12:00 PM with live countdown and GitHub cloud automation.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="background-ambient">
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+          <span class="pulse-radar"></span>
+        </div>
+        <div class="brand-text">
+          <h1>AUTO<span>PUSH</span></h1>
+          <span class="badge-sub">Firebase &bull; GitHub Engine</span>
+        </div>
+      </div>
+
+      <div class="header-status">
+        <div class="status-indicator" id="connectionStatusIndicator">
+          <span class="status-dot"></span>
+          <span class="status-text" id="connectionStatusText">Checking Status...</span>
+        </div>
+        <button class="btn-icon" id="guideBtn" title="Setup & Deployment Guide">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span>Guide</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <!-- Hero Countdown Section -->
+    <section class="hero-section">
+      <div class="hero-card glassmorphism">
+        <div class="hero-header">
+          <div class="section-tag">
+            <span class="pulse-dot"></span>
+            NEXT SCHEDULED CLOUD PUSH
+          </div>
+          <div class="timezone-toggle-group">
+            <button class="tz-btn active" id="tzLocalBtn">Local Time</button>
+            <button class="tz-btn" id="tzUtcBtn">UTC</button>
+          </div>
+        </div>
+
+        <div class="countdown-display">
+          <div class="timer-unit">
+            <div class="timer-box">
+              <span class="timer-val" id="countdownHours">00</span>
+            </div>
+            <span class="timer-label">HOURS</span>
+          </div>
+          <span class="timer-separator">:</span>
+          <div class="timer-unit">
+            <div class="timer-box">
+              <span class="timer-val" id="countdownMinutes">00</span>
+            </div>
+            <span class="timer-label">MINUTES</span>
+          </div>
+          <span class="timer-separator">:</span>
+          <div class="timer-unit">
+            <div class="timer-box">
+              <span class="timer-val" id="countdownSeconds">00</span>
+            </div>
+            <span class="timer-label">SECONDS</span>
+          </div>
+        </div>
+
+        <div class="progress-bar-container">
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="countdownProgressFill"></div>
+          </div>
+          <div class="progress-meta">
+            <span id="cycleStartLabel">Cycle: 12:00 AM</span>
+            <span id="cyclePercentage">0% Completed</span>
+            <span id="cycleTargetLabel">Target: 12:00 PM</span>
+          </div>
+        </div>
+
+        <div class="hero-footer">
+          <div class="next-target-box">
+            <span class="target-title">Target Schedule:</span>
+            <span class="target-time-badge" id="nextTriggerTimeBadge">12:00:00 PM</span>
+          </div>
+          <div class="next-letter-preview">
+            <span class="letter-label">Next Queued Letter:</span>
+            <div class="letter-chip" id="nextLetterPreview">
+              <span class="letter-char" id="previewChar">A</span>
+              <button class="btn-reroll" id="rerollLetterBtn" title="Shuffle Random Preview">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Metrics Stat Bar -->
+    <section class="stats-grid">
+      <div class="stat-card glassmorphism">
+        <div class="stat-icon cyan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">DAILY FREQUENCY</span>
+          <span class="stat-value">2 Pushes / Day</span>
+          <span class="stat-desc">Fixed at 12:00 AM & 12:00 PM</span>
+        </div>
+      </div>
+
+      <div class="stat-card glassmorphism">
+        <div class="stat-icon purple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">CLOUD ENGINE</span>
+          <span class="stat-value" id="cloudEngineStatus">Ready to Link</span>
+          <span class="stat-desc">24/7 GitHub Actions Cron</span>
+        </div>
+      </div>
+
+      <div class="stat-card glassmorphism">
+        <div class="stat-icon green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">TOTAL COMMITS</span>
+          <span class="stat-value" id="totalPushesCounter">0</span>
+          <span class="stat-desc" id="totalPushesDesc">Recorded in repo</span>
+        </div>
+      </div>
+
+      <div class="stat-card glassmorphism">
+        <div class="stat-icon amber">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">LAST PUSHED</span>
+          <span class="stat-value" id="lastPushedLetter">--</span>
+          <span class="stat-desc" id="lastPushedTime">No commits yet</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Grid: Configuration & Commit Feed -->
+    <div class="dashboard-grid">
+      <!-- Left Column: Repo Connection & Setup -->
+      <section class="config-panel glassmorphism">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+            </svg>
+            <h2>GitHub Connection Settings</h2>
+          </div>
+          <span class="secure-badge" title="Saved locally in your browser. Never sent to any external server.">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            Client-Side Encrypted
+          </span>
+        </div>
+
+        <form id="githubConfigForm" class="config-form" onsubmit="return false;">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ghOwner">GitHub Username / Org</label>
+              <input type="text" id="ghOwner" placeholder="e.g. octocat" required autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label for="ghRepo">Repository Name</label>
+              <input type="text" id="ghRepo" placeholder="e.g. daily-auto-push" required autocomplete="off">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ghBranch">Branch</label>
+              <input type="text" id="ghBranch" value="main" placeholder="main" required>
+            </div>
+            <div class="form-group">
+              <label for="ghTargetFile">Target File Path</label>
+              <input type="text" id="ghTargetFile" value="letters_log.txt" placeholder="letters_log.txt" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="label-with-action">
+              <label for="ghToken">GitHub Personal Access Token (PAT)</label>
+              <a href="https://github.com/settings/tokens/new?description=AutoPush%20Firebase%20Engine&scopes=repo,workflow" target="_blank" rel="noopener" class="link-token-help">
+                Generate Token (1-Click) &rarr;
+              </a>
+            </div>
+            <div class="input-with-icon">
+              <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" required>
+              <button type="button" class="btn-toggle-visibility" id="toggleTokenVisibility" title="Show/Hide Token">
+                <svg id="eyeIcon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+            <span class="field-hint">Requires <code>repo</code> & <code>workflow</code> permissions to create commits and schedule cloud actions.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="randomModeSelect">Random Generation Mode</label>
+            <select id="randomModeSelect">
+              <option value="uppercase">Single Uppercase Letter (A-Z)</option>
+              <option value="lowercase">Single Lowercase Letter (a-z)</option>
+              <option value="alphanumeric">Alphanumeric Character (A-Z, 0-9)</option>
+              <option value="word">Random English Word (Apple, Brave, Cyber...)</option>
+              <option value="emoji_letter">Emoji + Random Letter (✨ K, 🚀 X, 🌌 B)</option>
+            </select>
+          </div>
+
+          <div class="action-buttons-group">
+            <button type="button" class="btn-primary" id="installWorkflowBtn">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+                <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+              </svg>
+              <span>Install 24/7 Cloud Automation</span>
+            </button>
+
+            <button type="button" class="btn-secondary" id="testPushNowBtn">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+              <span>Instant Test Push Now</span>
+            </button>
+          </div>
+
+          <div class="workflow-status-card" id="workflowStatusCard">
+            <div class="ws-header">
+              <span class="ws-dot"></span>
+              <span class="ws-title">Automation Engine Status</span>
+            </div>
+            <p class="ws-text" id="workflowStatusDetails">
+              Click <strong>"Install 24/7 Cloud Automation"</strong> to configure GitHub Actions on your repository. Once installed, GitHub's cloud runners will execute automatically at 12 AM and 12 PM with no manual work needed!
+            </p>
+          </div>
+        </form>
+      </section>
+
+      <!-- Right Column: Live Commit Stream -->
+      <section class="feed-panel glassmorphism">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="4"/>
+              <line x1="1.05" y1="12" x2="7" y2="12"/>
+              <line x1="17.01" y1="12" x2="22.96" y2="12"/>
+            </svg>
+            <h2>Live Pushed Letters & Commits</h2>
+          </div>
+          <button class="btn-refresh" id="refreshCommitsBtn" title="Fetch Latest Commits">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+            <span>Sync</span>
+          </button>
+        </div>
+
+        <div class="commits-container" id="commitsContainer">
+          <!-- Commit List Items inserted dynamically -->
+          <div class="empty-state" id="emptyStatePlaceholder">
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </div>
+            <h3>No Repository Connected Yet</h3>
+            <p>Enter your GitHub details on the left and click "Install 24/7 Cloud Automation" or "Instant Test Push Now" to see your live letter stream.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Setup & Firebase Deploy Modal -->
+  <div class="modal-backdrop" id="guideModal">
+    <div class="modal-card glassmorphism">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <h3>Setup & Firebase Deployment Guide</h3>
+        </div>
+        <button class="btn-close-modal" id="closeGuideModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="guide-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Generate a GitHub Personal Access Token</h4>
+            <p>Go to <a href="https://github.com/settings/tokens/new?description=AutoPush%20Firebase%20Engine&scopes=repo,workflow" target="_blank" rel="noopener">GitHub Settings &rarr; Personal Access Tokens (Classic)</a>.</p>
+            <p>Check the <strong>repo</strong> scope and the <strong>workflow</strong> scope, then click <em>Generate token</em> and paste it into the dashboard.</p>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>1-Click 24/7 Cloud Automation</h4>
+            <p>Click the <strong>"Install 24/7 Cloud Automation"</strong> button. The website uses the GitHub API to directly create the <code>.github/workflows/auto-push.yml</code> file in your repository.</p>
+            <p>Once created, GitHub runs the automated push twice daily at <strong>12:00 AM</strong> and <strong>12:00 PM</strong> without you ever touching it!</p>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Deploy This Website to Firebase Hosting</h4>
+            <p>To host this website on your free Firebase account:</p>
+            <pre><code># 1. Login to Firebase
+firebase login
+
+# 2. Deploy the site to Firebase Hosting
+firebase deploy --only hosting</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>AutoPush Engine &bull; Automated 12:00 AM & 12:00 PM Cloud Pushes &bull; Powered by Firebase & GitHub Actions</p>
+    </div>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
